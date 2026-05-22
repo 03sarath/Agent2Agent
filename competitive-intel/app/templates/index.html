@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Competitive Intelligence Platform</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a1f2e, #252b3b);
+      border-bottom: 1px solid #2d3748;
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    header .logo {
+      font-size: 28px;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    header p {
+      font-size: 0.8rem;
+      color: #718096;
+      margin-top: 2px;
+    }
+
+    .badge {
+      margin-left: auto;
+      background: #1a3a5c;
+      color: #63b3ed;
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid #2b6cb0;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    main {
+      max-width: 860px;
+      margin: 40px auto;
+      padding: 0 24px;
+    }
+
+    .card {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .card h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #a0aec0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.flex-1 { flex: 1; }
+
+    label {
+      font-size: 0.8rem;
+      color: #718096;
+      font-weight: 500;
+    }
+
+    input[type="text"] {
+      background: #0f1117;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-size: 0.95rem;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+
+    input[type="text"]:focus {
+      border-color: #4299e1;
+    }
+
+    input[type="text"]::placeholder {
+      color: #4a5568;
+    }
+
+    button {
+      background: linear-gradient(135deg, #2b6cb0, #3182ce);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      white-space: nowrap;
+      align-self: flex-end;
+      min-width: 140px;
+    }
+
+    button:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* Pipeline progress */
+    .pipeline {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-top: 20px;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: #4a5568;
+      background: #0f1117;
+      border: 1px solid #2d3748;
+      transition: all 0.3s;
+    }
+
+    .step .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4a5568;
+    }
+
+    .step.active {
+      color: #63b3ed;
+      border-color: #2b6cb0;
+      background: #1a3a5c22;
+    }
+
+    .step.active .dot {
+      background: #63b3ed;
+      box-shadow: 0 0 6px #63b3ed;
+      animation: pulse 1s infinite;
+    }
+
+    .step.done { color: #68d391; border-color: #276749; }
+    .step.done .dot { background: #68d391; }
+
+    .arrow {
+      color: #2d3748;
+      margin: 0 4px;
+      font-size: 0.9rem;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Report output */
+    #report-card { display: none; }
+
+    .report-content {
+      background: #0f1117;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 20px;
+      font-size: 0.9rem;
+      line-height: 1.8;
+      color: #cbd5e0;
+      white-space: pre-wrap;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .report-content h2 {
+      color: #63b3ed;
+      font-size: 1.1rem;
+      margin: 16px 0 8px;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .report-content h3 {
+      color: #a0aec0;
+      font-size: 0.95rem;
+      margin: 12px 0 6px;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .report-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .report-meta .competitor-tag {
+      background: #2b6cb033;
+      color: #63b3ed;
+      border: 1px solid #2b6cb066;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .report-meta .timestamp {
+      font-size: 0.75rem;
+      color: #4a5568;
+    }
+
+    .copy-btn {
+      background: #2d3748;
+      font-size: 0.8rem;
+      padding: 6px 14px;
+      min-width: auto;
+      margin-top: 10px;
+    }
+
+    /* Error */
+    .error-box {
+      background: #2d1515;
+      border: 1px solid #742a2a;
+      border-radius: 8px;
+      padding: 14px 18px;
+      color: #fc8181;
+      font-size: 0.88rem;
+      margin-top: 16px;
+      display: none;
+    }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid #ffffff44;
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Info note */
+    .info-note {
+      font-size: 0.78rem;
+      color: #4a5568;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="logo">🔍</span>
+  <div>
+    <h1>Competitive Intelligence Platform</h1>
+    <p>Powered by Google ADK · Gemini 2.5 Pro · Multi-Agent Pipeline</p>
+  </div>
+  <span class="badge">VERTEX AI</span>
+</header>
+
+<main>
+
+  <!-- Input card -->
+  <div class="card">
+    <h2>Analyze a Competitor</h2>
+
+    <div class="form-row">
+      <div class="form-group flex-1">
+        <label for="competitor">Competitor Name *</label>
+        <input type="text" id="competitor" placeholder="e.g. OpenAI, Anthropic, Salesforce" />
+      </div>
+      <div class="form-group flex-1">
+        <label for="context">Focus Area (optional)</label>
+        <input type="text" id="context" placeholder="e.g. focus on enterprise pricing" />
+      </div>
+      <button id="analyze-btn" onclick="analyze()">Analyze</button>
+    </div>
+
+    <div class="info-note">
+      ⏱ Analysis takes 60–120 seconds — four AI agents run sequentially.
+    </div>
+
+    <!-- Agent pipeline progress -->
+    <div class="pipeline" id="pipeline" style="display:none; margin-top: 18px;">
+      <div class="step" id="step-scan">
+        <span class="dot"></span> Market Scan
+      </div>
+      <span class="arrow">→</span>
+      <div class="step" id="step-sentiment">
+        <span class="dot"></span> Sentiment
+      </div>
+      <span class="arrow">→</span>
+      <div class="step" id="step-pricing">
+        <span class="dot"></span> Pricing
+      </div>
+      <span class="arrow">→</span>
+      <div class="step" id="step-report">
+        <span class="dot"></span> Report
+      </div>
+    </div>
+
+    <div class="error-box" id="error-box"></div>
+  </div>
+
+  <!-- Report card -->
+  <div class="card" id="report-card">
+    <div class="report-meta">
+      <span class="competitor-tag" id="report-competitor-tag"></span>
+      <span class="timestamp" id="report-timestamp"></span>
+    </div>
+    <div class="report-content" id="report-content"></div>
+    <button class="copy-btn" onclick="copyReport()">Copy Report</button>
+  </div>
+
+</main>
+
+<script>
+  // Pipeline step timing (approximate seconds into a ~90s run)
+  const STEP_TIMING = [
+    { id: 'step-scan',      start: 2,  end: 30 },
+    { id: 'step-sentiment', start: 30, end: 55 },
+    { id: 'step-pricing',   start: 55, end: 80 },
+    { id: 'step-report',    start: 80, end: 100 },
+  ];
+
+  let pipelineInterval = null;
+  let startTime = null;
+
+  function startPipelineAnimation() {
+    document.getElementById('pipeline').style.display = 'flex';
+    STEP_TIMING.forEach(s => {
+      const el = document.getElementById(s.id);
+      el.classList.remove('active', 'done');
+    });
+    startTime = Date.now();
+    pipelineInterval = setInterval(updatePipeline, 500);
+  }
+
+  function updatePipeline() {
+    const elapsed = (Date.now() - startTime) / 1000;
+    STEP_TIMING.forEach(s => {
+      const el = document.getElementById(s.id);
+      if (elapsed >= s.end) {
+        el.classList.remove('active');
+        el.classList.add('done');
+      } else if (elapsed >= s.start) {
+        el.classList.remove('done');
+        el.classList.add('active');
+      }
+    });
+  }
+
+  function stopPipelineAnimation(success) {
+    clearInterval(pipelineInterval);
+    if (success) {
+      STEP_TIMING.forEach(s => {
+        document.getElementById(s.id).classList.add('done');
+        document.getElementById(s.id).classList.remove('active');
+      });
+    }
+  }
+
+  function formatReport(text) {
+    // Render markdown-style headings as styled HTML
+    return text
+      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+      .replace(/^---$/gm, '<hr style="border-color:#2d3748;margin:12px 0">')
+      .replace(/\*\*(.+?)\*\*/g, '<strong style="color:#e2e8f0">$1</strong>');
+  }
+
+  async function analyze() {
+    const competitor = document.getElementById('competitor').value.trim();
+    const context = document.getElementById('context').value.trim();
+    const btn = document.getElementById('analyze-btn');
+    const errorBox = document.getElementById('error-box');
+    const reportCard = document.getElementById('report-card');
+
+    if (!competitor) {
+      showError('Please enter a competitor name.');
+      return;
+    }
+
+    // Reset UI
+    errorBox.style.display = 'none';
+    reportCard.style.display = 'none';
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Analyzing…';
+
+    startPipelineAnimation();
+
+    try {
+      const response = await fetch('/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ competitor, context }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.error) {
+        throw new Error(data.error || 'Unknown error from server');
+      }
+
+      stopPipelineAnimation(true);
+      showReport(data.competitor, data.report);
+
+    } catch (err) {
+      stopPipelineAnimation(false);
+      showError(err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = 'Analyze';
+    }
+  }
+
+  function showReport(competitor, report) {
+    document.getElementById('report-competitor-tag').textContent = competitor;
+    document.getElementById('report-timestamp').textContent =
+      'Generated ' + new Date().toLocaleString();
+    document.getElementById('report-content').innerHTML = formatReport(report);
+    document.getElementById('report-card').style.display = 'block';
+    document.getElementById('report-card').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function showError(msg) {
+    const box = document.getElementById('error-box');
+    box.textContent = '⚠ ' + msg;
+    box.style.display = 'block';
+  }
+
+  function copyReport() {
+    const text = document.getElementById('report-content').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy Report', 2000);
+    });
+  }
+
+  // Allow Enter key on competitor input to trigger analyze
+  document.getElementById('competitor').addEventListener('keydown', e => {
+    if (e.key === 'Enter') analyze();
+  });
+</script>
+
+</body>
+</html>
