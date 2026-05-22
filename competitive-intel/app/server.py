@@ -20,7 +20,6 @@ from google.adk.memory.in_memory_memory_service import InMemoryMemoryService
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
-from vertexai.preview import reasoning_engines
 
 from app.agents import host_agent
 from app.utils import build_query, make_session_id, sanitize_competitor_name
@@ -39,12 +38,12 @@ RESOURCE_NAME = os.getenv('AGENT_ENGINE_RESOURCE_NAME', '')
 
 if RESOURCE_NAME:
     # Production: delegate everything to Vertex AI Agent Engine.
-    # Sessions are persisted and managed by Vertex — no InMemory services needed.
-    vertexai.init(
+    # vertexai.Client correctly binds stream_query and all other methods.
+    _client = vertexai.Client(
         project=os.environ['GOOGLE_CLOUD_PROJECT'],
         location=os.getenv('GOOGLE_CLOUD_LOCATION', 'us-central1'),
     )
-    remote_agent = reasoning_engines.ReasoningEngine(RESOURCE_NAME)
+    remote_agent = _client.agent_engines.get(name=RESOURCE_NAME)
     runner = None
     print(f'[server] Mode: Vertex AI Agent Engine → {RESOURCE_NAME}')
 else:
