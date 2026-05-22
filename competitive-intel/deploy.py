@@ -19,17 +19,22 @@ from app.agents import host_agent
 
 load_dotenv()
 
-PROJECT  = os.environ["GOOGLE_CLOUD_PROJECT"]
-LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1")
+PROJECT        = os.environ["GOOGLE_CLOUD_PROJECT"]
+LOCATION       = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1")
+# GCS bucket used to stage agent code before deployment.
+# Must exist and be in the same region as LOCATION.
+# Create once with: gsutil mb -l us-central1 gs://<your-project-id>-agent-staging
+STAGING_BUCKET = os.getenv("STAGING_BUCKET", f"gs://{PROJECT}-agent-staging")
 
 
 def deploy() -> str:
     """Deploy the host agent to Vertex AI Agent Engine and return its resource name."""
-    print(f"Project  : {PROJECT}")
-    print(f"Location : {LOCATION}")
+    print(f"Project        : {PROJECT}")
+    print(f"Location       : {LOCATION}")
+    print(f"Staging bucket : {STAGING_BUCKET}")
     print()
 
-    vertexai.init(project=PROJECT, location=LOCATION)
+    vertexai.init(project=PROJECT, location=LOCATION, staging_bucket=STAGING_BUCKET)
 
     adk_app = reasoning_engines.AdkApp(
         agent=host_agent,
